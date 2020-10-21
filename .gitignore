@@ -1,0 +1,15 @@
+.idea/
+*.md
+!README.md
+*.egg-info/
+build/
+test.py
+__pycache__/
+.vscode/
+.env
+.virtualenvs/
+.venv/
+*.pkl
+*.swp
+*.svg
+*.out
