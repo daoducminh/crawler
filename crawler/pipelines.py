@@ -5,14 +5,31 @@
 
 
 # useful for handling different item types with a single interface
+
+import json
 from itemadapter import ItemAdapter
 
 
 class ChessPipeline:
     def open_spider(self, spider):
-        self.file = open('links.out','w')
+        self.file = open('links.out', 'w')
+
     def close_spider(self, spider):
         self.file.close()
+
     def process_item(self, item, spider):
         self.file.write(f"{item['file_urls']}\n")
+        return item
+
+
+class JsonLinePipeline:
+    def open_spider(self, spider):
+        self.file = open('foods.jsonl', 'w')
+
+    def close_spider(self, spider):
+        self.file.close()
+
+    def process_item(self, item, spider):
+        line = json.dumps(ItemAdapter(item).asdict()) + '\n'
+        self.file.write(line)
         return item

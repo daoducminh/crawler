@@ -18,6 +18,7 @@ setup(
     entry_points={'scrapy': ['settings = book_crawler.settings']},
     install_requires=[
         'scrapy',
+        'scrapy-splash',
         'pymongo',
         'pylint',
         'autopep8',
