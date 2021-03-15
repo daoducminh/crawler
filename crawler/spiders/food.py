@@ -58,9 +58,9 @@ class FoodSpider(Spider):
         # },
         # 'SPLASH_URL': 'http://127.0.0.1:8050',
         # 'DUPEFILTER_CLASS': 'scrapy_splash.SplashAwareDupeFilter',
-        # 'ITEM_PIPELINES': {
-        #     'crawler.pipelines.FoodPipeline': 100
-        # }
+        'ITEM_PIPELINES': {
+            'crawler.pipelines.FoodPipeline': 100
+        },
         'RETRY_TIMES': 20
     }
 
