@@ -56,6 +56,6 @@ class FoodPipeline:
             self.review.write(line)
         if item[TYPE] == FOLLOWER or item[TYPE] == FOLLOWING:
             a = ItemAdapter(item).asdict()
-            line = ','.join(a[FOLLOW])+'\n'
+            line = f'{a[FOLLOW][0]},{a[FOLLOW][1]}\n'
             self.follow.write(line)
         return item
