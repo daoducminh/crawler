@@ -51,7 +51,8 @@ class FoodPipeline:
             line = f'{item[USER_ID]},{item[USERNAME]},{item[FULL_NAME]}\n'
             self.user.write(line)
         if item[TYPE] == REVIEW:
-            line = f'{item[REVIEW_ID]},{item[RECIPE_ID]},{item[USER_ID]},{item[RATING]},{item[COMMENT]}\n'
+            review = item[REVIEW]
+            line = f'{review[REVIEW_ID]},{review[RECIPE_ID]},{review[USER_ID]},{review[RATING]},{review[COMMENT]}\n'
             self.review.write(line)
         if item[TYPE] == FOLLOWER or item[TYPE] == FOLLOWING:
             a = ItemAdapter(item).asdict()
