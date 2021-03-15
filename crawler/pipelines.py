@@ -8,6 +8,12 @@
 
 import json
 from itemadapter import ItemAdapter
+from pathlib import Path
+from os import system
+
+from crawler.constants.food import *
+
+FOOD_DATA = 'food/'
 
 
 class ChessPipeline:
@@ -22,14 +28,33 @@ class ChessPipeline:
         return item
 
 
-class JsonLinePipeline:
+class FoodPipeline:
     def open_spider(self, spider):
-        self.file = open('foods.jsonl', 'w')
+        Path(FOOD_DATA).mkdir(parents=True, exist_ok=True)
+        self.recipe = open(FOOD_DATA+'recipe.jsonl', 'w')
+        self.user = open(FOOD_DATA+'user.dat', 'w')
+        self.review = open(FOOD_DATA+'review.dat', 'w')
+        self.follow = open(FOOD_DATA+'follow.dat', 'w')
 
     def close_spider(self, spider):
-        self.file.close()
+        self.recipe.close()
+        self.user.close()
+        self.review.close()
+        self.follow.close()
+        system('./save_all.sh')
 
     def process_item(self, item, spider):
-        line = json.dumps(ItemAdapter(item).asdict()) + '\n'
-        self.file.write(line)
+        if item[TYPE] == RECIPE:
+            line = json.dumps(ItemAdapter(item).asdict()) + '\n'
+            self.recipe.write(line)
+        if item[TYPE] == USER:
+            line = f'{item[USER_ID]},{item[USERNAME]},{item[FULL_NAME]}\n'
+            self.user.write(line)
+        if item[TYPE] == REVIEW:
+            line = f'{item[REVIEW_ID]},{item[RECIPE_ID]},{item[USER_ID]},{item[RATING]},{item[COMMENT]}\n'
+            self.review.write(line)
+        if item[TYPE] == FOLLOWER or item[TYPE] == FOLLOWING:
+            a = ItemAdapter(item).asdict()
+            line = ','.join(a[FOLLOW])+'\n'
+            self.follow.write(line)
         return item
