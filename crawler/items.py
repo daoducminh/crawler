@@ -14,7 +14,7 @@ def get_review_count(x):
 
 class Recipe(Item):
     full_name = Field(
-        input_processor=MapCompose(remove_tags),
+        input_processor=MapCompose(remove_tags, str.strip),
         output_processor=Join()
     )
     # ingredients = Field(
@@ -22,10 +22,10 @@ class Recipe(Item):
     #     output_processor=Join()
     # )
     directions = Field(
-        input_processor=MapCompose(remove_tags)
+        input_processor=MapCompose(remove_tags, str.strip)
     )
     facts_time = Field(
-        input_processor=MapCompose(remove_tags),
+        input_processor=MapCompose(remove_tags, str.strip),
         output_processor=Join()
     )
     review_count = Field(
