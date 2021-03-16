@@ -41,7 +41,6 @@ class FoodPipeline:
         self.user.close()
         self.review.close()
         self.follow.close()
-        system('./save_all.sh')
 
     def process_item(self, item, spider):
         if item[TYPE] == RECIPE:
