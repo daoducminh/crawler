@@ -8,9 +8,14 @@ from scrapy_splash import SplashRequest, SplashResponse
 from crawler.items import Recipe, User
 from crawler.constants.food import *
 
-PAGES = 200
+PAGES = 2000
 RECIPE_URL = 'https://www.food.com/recipe/all/popular?pn={}'
 MOST_TWEAK_URL = 'https://www.food.com/ideas/most-tweaked-recipes-6655'
+FOLLOW_URL = 'https://api.food.com/external/v1/members/{0}/feed/{1}?pn={2}&size=1'
+REVIEW_URL = 'https://api.food.com/external/v1/recipes/{0}/feed/?pn={1}&size=1'
+USER_URL = 'https://www.food.com/user/{}'
+OWN_RECIPE_URL = 'https://api.food.com/external/v1/members/{0}/feed/recipes?pn={1}&size=1'
+POPULAR_URL = 'https://api.food.com/services/mobile/fdc/search/sectionfront?pn={}&recordType=Recipe&sortBy=mostPopular&collectionId=17'
 
 # wait_recipe = """
 # function main(splash)
@@ -23,10 +28,6 @@ MOST_TWEAK_URL = 'https://www.food.com/ideas/most-tweaked-recipes-6655'
 #   return {html=splash:html()}
 # end
 # """
-FOLLOW_URL = 'https://api.food.com/external/v1/members/{0}/feed/{1}?pn={2}&size=1'
-REVIEW_URL = 'https://api.food.com/external/v1/recipes/{0}/feed/?pn={1}&size=1'
-USER_URL = 'https://www.food.com/user/{}'
-OWN_RECIPE_URL = 'https://api.food.com/external/v1/members/{0}/feed/recipes?pn={1}&size=1'
 
 
 def handle_follow(x):
@@ -46,7 +47,6 @@ def handle_review(x):
 class FoodSpider(Spider):
     name = 'food'
     allowed_domains = ['food.com']
-    start_urls = [MOST_TWEAK_URL]
     custom_settings = {
         # 'SPIDER_MIDDLEWARES': {
         #     'scrapy_splash.SplashDeduplicateArgsMiddleware': 100,
@@ -64,6 +64,35 @@ class FoodSpider(Spider):
         'RETRY_TIMES': 20
     }
 
+    def __init__(self, number=PAGES, *args, **kwargs):
+        super(FoodSpider, self).__init__(*args, **kwargs)
+        self.number = number
+
+    def start_requests(self):
+        try:
+            n = int(self.number)
+            for i in range(1, 1+n):
+                yield Request(
+                    url=POPULAR_URL.format(i),
+                    callback=self.parse_search_recipes,
+                    headers={
+                        'Accept': 'application/json'
+                    }
+                )
+        except Exception as e:
+            print(e)
+
+    def parse_search_recipes(self, response):
+        body = response.json()
+        items = body['response']['results']
+        if items:
+            for i in items:
+                yield Request(
+                    url=i['record_url'],
+                    callback=self.parse_recipe,
+                    cb_kwargs=dict(get_author=True)
+                )
+
     def parse(self, response):
         selectors = response.xpath(
             "//a[contains(@href,'/recipe/')]/@href"
@@ -80,7 +109,7 @@ class FoodSpider(Spider):
                 cb_kwargs=dict(get_author=True)
             )
 
-    def parse_recipe(self, response, get_author):
+    def parse_recipe(self, response, get_author=False):
         item = ItemLoader(item=Recipe(), response=response)
         item.add_css(FULL_NAME, '.recipe-title')
         item.add_css(DIRECTIONS, 'li.recipe-directions__step')
@@ -182,8 +211,7 @@ class FoodSpider(Spider):
             recipe = item[0]
             yield Request(
                 url=recipe['recipeUrl'],
-                callback=self.parse_recipe,
-                cb_kwargs=dict(get_author=False)
+                callback=self.parse_recipe
             )
             if recipe['total'] > 1:
                 for i in range(2, 1+recipe['total']):
@@ -199,8 +227,7 @@ class FoodSpider(Spider):
             for i in items:
                 yield Request(
                     url=i['recipeUrl'],
-                    callback=self.parse_recipe,
-                    cb_kwargs=dict(get_author=False)
+                    callback=self.parse_recipe
                 )
 
     def parse_follow(self, response, user, f_type):
