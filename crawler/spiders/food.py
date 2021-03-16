@@ -213,8 +213,8 @@ class FoodSpider(Spider):
                 url=recipe['recipeUrl'],
                 callback=self.parse_recipe
             )
-            if recipe['total'] > 1:
-                for i in range(2, 1+recipe['total']):
+            if body['total'] > 1:
+                for i in range(2, 1+body['total']):
                     yield Request(
                         url=OWN_RECIPE_URL.format(recipe['memberId'], i),
                         callback=self.parse_own_recipe
