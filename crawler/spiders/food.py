@@ -59,7 +59,7 @@ class FoodSpider(Spider):
         # 'SPLASH_URL': 'http://127.0.0.1:8050',
         # 'DUPEFILTER_CLASS': 'scrapy_splash.SplashAwareDupeFilter',
         'ITEM_PIPELINES': {
-            'crawler.pipelines.FoodPipeline': 100
+            'crawler.pipelines.FoodPicklePipeline': 100
         },
         'RETRY_TIMES': 20
     }
@@ -112,6 +112,7 @@ class FoodSpider(Spider):
     def parse_recipe(self, response, get_author=False):
         item = ItemLoader(item=Recipe(), response=response)
         item.add_css(FULL_NAME, '.recipe-title')
+        item.add_css(INGREDIENTS, '.recipe-ingredients__ingredient')
         item.add_css(DIRECTIONS, 'li.recipe-directions__step')
         item.add_css(FACTS_TIME, '.recipe-facts__time > span:nth-child(2)')
         # item.add_css(
@@ -123,6 +124,9 @@ class FoodSpider(Spider):
         #     '.recipe-contributor__note span.text-truncate__text'
         # )
         item.add_css(REVIEW_COUNT, '.reviews-count')
+        item.add_xpath(
+            SCRIPT, "//script[starts-with(text(),'window.__NUXT__')]/text()"
+        )
         recipe = dict(item.load_item())
 
         # Get recipe id
@@ -171,10 +175,10 @@ class FoodSpider(Spider):
             user[FOLLOWING] = int(user[FOLLOWING])
             user[TYPE] = USER
             yield user
-            yield Request(
-                url=OWN_RECIPE_URL.format(user[USER_ID], 1),
-                callback=self.parse_first_own_recipe
-            )
+            # yield Request(
+            #     url=OWN_RECIPE_URL.format(user[USER_ID], 1),
+            #     callback=self.parse_first_own_recipe
+            # )
             # Followers
             if user[FOLLOWER]:
                 for i in range(1, 1+user[FOLLOWER]):

@@ -10,6 +10,7 @@ import json
 from itemadapter import ItemAdapter
 from pathlib import Path
 from os import system
+import pickle
 
 from crawler.constants.food import *
 
@@ -57,4 +58,29 @@ class FoodPipeline:
             a = ItemAdapter(item).asdict()
             line = f'{a[FOLLOW][0]},{a[FOLLOW][1]}\n'
             self.follow.write(line)
+        return item
+
+
+class FoodPicklePipeline:
+    def open_spider(self, spider):
+        self.data = {
+            RECIPE: [],
+            USER: [],
+            REVIEW: [],
+            FOLLOW: set()
+        }
+
+    def close_spider(self, spider):
+        Path(FOOD_DATA).mkdir(parents=True, exist_ok=True)
+        with open(FOOD_DATA + 'data.pkl', 'w') as file:
+            pickle.dump(self.data, file)
+
+    def process_item(self, item, spider):
+        if item[TYPE] == FOLLOWER or item[TYPE] == FOLLOWING:
+            a = ItemAdapter(item).asdict()
+            self.data[FOLLOW].add(a[FOLLOW])
+        else:
+            t = item[TYPE]
+            del item[TYPE]
+            self.data[item[TYPE]].append(t)
         return item

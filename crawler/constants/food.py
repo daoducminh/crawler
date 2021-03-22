@@ -26,3 +26,5 @@ FOLLOWER = 'follower'
 FOLLOWING = 'following'
 USER_ID = 'user_id'
 FOLLOW = 'follow'
+
+SCRIPT = 'script'
