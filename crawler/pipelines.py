@@ -67,7 +67,8 @@ class FoodPicklePipeline:
             RECIPE: [],
             USER: [],
             REVIEW: [],
-            FOLLOW: set()
+            FOLLOW: set(),
+            ERROR: []
         }
 
     def close_spider(self, spider):
