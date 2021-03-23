@@ -83,5 +83,5 @@ class FoodPicklePipeline:
         else:
             t = item[TYPE]
             del item[TYPE]
-            self.data[item[TYPE]].append(t)
+            self.data[t].append(item)
         return item
