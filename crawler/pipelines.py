@@ -73,7 +73,7 @@ class FoodPicklePipeline:
 
     def close_spider(self, spider):
         Path(FOOD_DATA).mkdir(parents=True, exist_ok=True)
-        with open(FOOD_DATA + 'data.pkl', 'w') as file:
+        with open(FOOD_DATA + 'data.pkl', 'wb') as file:
             pickle.dump(self.data, file)
 
     def process_item(self, item, spider):
