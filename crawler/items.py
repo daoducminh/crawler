@@ -53,8 +53,7 @@ class Recipe(Item):
     script = Field(
         input_processor=MapCompose(
             str.strip, decode_escape_unicode, extract_js
-        ),
-        output_processor=Join()
+        )
     )
     # facts_serves = Field(
     #     input_processor=MapCompose(remove_tags),

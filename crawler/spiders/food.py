@@ -249,10 +249,8 @@ class FoodSpider(Spider):
         if item:
             if item[TYPE] == REVIEW:
                 review = handle_review(item)
-                yield {
-                    TYPE: REVIEW,
-                    REVIEW: review
-                }
+                review[TYPE] = REVIEW
+                yield review
                 yield Request(
                     url=USER_URL.format(review[USER_ID]),
                     callback=self.parse_user
