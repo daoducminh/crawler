@@ -38,27 +38,6 @@ class Recipe(Item):
     directions = Field(
         input_processor=MapCompose(remove_tags, str.strip)
     )
-    # facts_time = Field(
-    #     input_processor=MapCompose(remove_tags, str.strip),
-    #     output_processor=Join()
-    # )
-    # review_count = Field(
-    #     input_processor=MapCompose(remove_tags, str.strip, get_review_count),
-    #     output_processor=Join()
-    # )
-    # script = Field(
-    #     input_processor=MapCompose(
-    #         str.strip, decode_escape_unicode, extract_js
-    #     )
-    # )
-    # facts_serves = Field(
-    #     input_processor=MapCompose(remove_tags),
-    #     output_processor=Join()
-    # )
-    # description = Field(
-    #     input_processor=MapCompose(remove_tags),
-    #     output_processor=Join()
-    # )
 
 
 def get_username(x):
