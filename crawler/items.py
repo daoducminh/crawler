@@ -32,29 +32,25 @@ def extract_js(x):
 
 
 class Recipe(Item):
-    full_name = Field(
-        input_processor=MapCompose(remove_tags, str.strip),
-        output_processor=Join()
-    )
     ingredients = Field(
         input_processor=MapCompose(remove_tags)
     )
     directions = Field(
         input_processor=MapCompose(remove_tags, str.strip)
     )
-    facts_time = Field(
-        input_processor=MapCompose(remove_tags, str.strip),
-        output_processor=Join()
-    )
-    review_count = Field(
-        input_processor=MapCompose(remove_tags, str.strip, get_review_count),
-        output_processor=Join()
-    )
-    script = Field(
-        input_processor=MapCompose(
-            str.strip, decode_escape_unicode, extract_js
-        )
-    )
+    # facts_time = Field(
+    #     input_processor=MapCompose(remove_tags, str.strip),
+    #     output_processor=Join()
+    # )
+    # review_count = Field(
+    #     input_processor=MapCompose(remove_tags, str.strip, get_review_count),
+    #     output_processor=Join()
+    # )
+    # script = Field(
+    #     input_processor=MapCompose(
+    #         str.strip, decode_escape_unicode, extract_js
+    #     )
+    # )
     # facts_serves = Field(
     #     input_processor=MapCompose(remove_tags),
     #     output_processor=Join()

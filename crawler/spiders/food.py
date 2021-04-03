@@ -87,67 +87,71 @@ class FoodSpider(Spider):
         items = body['response']['results']
         if items:
             for i in items:
+                data = {
+                    DESCRIPTION: i[DESCRIPTION],
+                    IMAGE_URL: i['recipe_photo_url'],
+                    REVIEW_COUNT: i['main_num_ratings'],
+                    CATEGORY: i['primary_category_name'],
+                    FACTS_TIME: i['recipe_totaltime'],
+                    RECIPE_ID: i[RECIPE_ID],
+                    AUTHOR_ID: i['main_userid'],
+                    AUTHOR_URL: i['recipe_user_url'],
+                    FULL_NAME: i['main_title'],
+                    USER_AVATAR_URL: i[USER_AVATAR_URL]
+                }
                 yield Request(
                     url=i['record_url'],
                     callback=self.parse_recipe,
-                    cb_kwargs=dict(get_author=True)
+                    cb_kwargs=dict(
+                        data=data,
+                        get_author=True
+                    )
                 )
 
-    def parse(self, response):
-        selectors = response.xpath(
-            "//a[contains(@href,'/recipe/')]/@href"
-        )
-        links = [i.get() for i in selectors]
-        for i in links:
-            # yield SplashRequest(
-            #     url=i,
-            #     callback=self.parse_recipe
-            # )
-            yield Request(
-                url=i,
-                callback=self.parse_recipe,
-                cb_kwargs=dict(get_author=True)
-            )
+    # def parse(self, response):
+    #     selectors = response.xpath(
+    #         "//a[contains(@href,'/recipe/')]/@href"
+    #     )
+    #     links = [i.get() for i in selectors]
+    #     for i in links:
+    #         # yield SplashRequest(
+    #         #     url=i,
+    #         #     callback=self.parse_recipe
+    #         # )
+    #         yield Request(
+    #             url=i,
+    #             callback=self.parse_recipe,
+    #             cb_kwargs=dict(get_author=True)
+    #         )
 
-    def parse_recipe(self, response, get_author=False):
+    def parse_recipe(self, response, data, get_author=False):
         item = ItemLoader(item=Recipe(), response=response)
-        item.add_css(FULL_NAME, '.recipe-title')
         item.add_css(INGREDIENTS, '.recipe-ingredients__ingredient')
         item.add_css(DIRECTIONS, 'li.recipe-directions__step')
-        item.add_css(FACTS_TIME, '.recipe-facts__time > span:nth-child(2)')
-        # item.add_css(
-        #     FACTS_SERVES,
-        #     '.recipe-facts__servings > span:nth-child(2)'
-        # )
-        # item.add_css(
-        #     DESCRIPTION,
-        #     '.recipe-contributor__note span.text-truncate__text'
-        # )
-        item.add_css(REVIEW_COUNT, '.reviews-count')
-        item.add_xpath(
-            SCRIPT, "//script[starts-with(text(),'window.__NUXT__')]/text()"
-        )
         recipe = dict(item.load_item())
-
-        # Get recipe id
-        url = response.url
-        author_url = response.css(
-            'a.recipe-details__author-link::attr(href)'
-        ).get()
         try:
-            recipe_id = int(url.split('-')[-1])
-            author_id = int(author_url.split('/')[-1])
-            recipe[REVIEW_COUNT] = int(recipe[REVIEW_COUNT])
+            recipe_id = int(data[RECIPE_ID])
+            author_id = int(data[AUTHOR_ID])
+            review_count = int(data[REVIEW_COUNT])
+            facts_time = int(data[FACTS_TIME])
+            # Append additional information
+            recipe = {**recipe, **data}
             recipe[RECIPE_ID] = recipe_id
-            recipe[AUTHOR] = author_id
+            recipe[AUTHOR_ID] = author_id
+            recipe[REVIEW_COUNT] = review_count
+            recipe[FACTS_TIME] = facts_time
             recipe[TYPE] = RECIPE
+            del recipe[USER_AVATAR_URL]
+
             yield recipe
             if get_author:
                 yield Request(
-                    url=author_url,
-                    callback=self.parse_user
+                    url=data[AUTHOR_URL],
+                    callback=self.parse_user,
+                    cb_kwargs=dict(
+                        user_avatar_url=data[USER_AVATAR_URL]
+                    )
                 )
-            review_count = recipe[REVIEW_COUNT]
             if review_count:
                 for i in range(1, 1+review_count):
                     yield Request(
@@ -157,11 +161,11 @@ class FoodSpider(Spider):
         except Exception as e:
             yield {
                 TYPE: ERROR,
-                URL: url,
+                URL: response.url,
                 ERROR: str(e)
             }
 
-    def parse_user(self, response):
+    def parse_user(self, response, user_avatar_url):
         item = ItemLoader(item=User(), response=response)
         item.add_css(FULL_NAME, '.name-bio-message h3')
         item.add_css(USERNAME, '.profileusername')
@@ -174,6 +178,7 @@ class FoodSpider(Spider):
             user[FOLLOWER] = int(user[FOLLOWER])
             user[FOLLOWING] = int(user[FOLLOWING])
             user[TYPE] = USER
+            user[USER_AVATAR_URL] = user_avatar_url
             yield user
             # yield Request(
             #     url=OWN_RECIPE_URL.format(user[USER_ID], 1),
