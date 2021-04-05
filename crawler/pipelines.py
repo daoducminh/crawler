@@ -74,11 +74,11 @@ class FoodPicklePipeline:
             FOLLOW: set(),
             ERROR: []
         }
-        self.timestamp = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 
     def close_spider(self, spider):
         Path(FOOD_DATA).mkdir(parents=True, exist_ok=True)
-        filename = FOOD_DATA_FILE.format(self.timestamp)
+        timestamp = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
+        filename = FOOD_DATA_FILE.format(timestamp)
         with open(filename, 'wb') as file:
             pickle.dump(self.data, file)
         src = Path(filename)
