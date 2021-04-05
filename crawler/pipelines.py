@@ -9,12 +9,16 @@
 import json
 from itemadapter import ItemAdapter
 from pathlib import Path
-from os import system
 import pickle
+import datetime
+import shutil
 
 from crawler.constants.food import *
 
 FOOD_DATA = 'food/'
+FOOD_DATA_FILE = FOOD_DATA+'{}.pkl'
+DEST_FOLDER = '/content/drive/MyDrive/Projects/it5230/'
+DEST = Path(DEST_FOLDER)
 
 
 class ChessPipeline:
@@ -70,11 +74,15 @@ class FoodPicklePipeline:
             FOLLOW: set(),
             ERROR: []
         }
+        self.timestamp = datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S")
 
     def close_spider(self, spider):
         Path(FOOD_DATA).mkdir(parents=True, exist_ok=True)
-        with open(FOOD_DATA + 'data.pkl', 'wb') as file:
+        filename = FOOD_DATA_FILE.format(self.timestamp)
+        with open(filename, 'wb') as file:
             pickle.dump(self.data, file)
+        src = Path(filename)
+        shutil.copy(src, DEST)
 
     def process_item(self, item, spider):
         if item[TYPE] == FOLLOWER or item[TYPE] == FOLLOWING:
