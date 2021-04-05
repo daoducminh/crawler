@@ -97,7 +97,7 @@ class FoodSpider(Spider):
                     AUTHOR_ID: i['main_userid'],
                     AUTHOR_URL: i['recipe_user_url'],
                     FULL_NAME: i['main_title'],
-                    USER_AVATAR_URL: i.get(USER_AVATAR_URL, '')
+                    USER_AVATAR_URL: i.get(USER_AVATAR_URL)
                 }
                 yield Request(
                     url=i['record_url'],
@@ -142,6 +142,7 @@ class FoodSpider(Spider):
             recipe[FACTS_TIME] = facts_time
             recipe[TYPE] = RECIPE
             del recipe[USER_AVATAR_URL]
+            del recipe[AUTHOR_URL]
 
             yield recipe
             if get_author:
@@ -149,7 +150,7 @@ class FoodSpider(Spider):
                     url=data[AUTHOR_URL],
                     callback=self.parse_user,
                     cb_kwargs=dict(
-                        user_avatar_url=data[USER_AVATAR_URL]
+                        user_avatar_url=data.get(USER_AVATAR_URL)
                     )
                 )
             if review_count:
@@ -165,7 +166,7 @@ class FoodSpider(Spider):
                 ERROR: str(e)
             }
 
-    def parse_user(self, response, user_avatar_url):
+    def parse_user(self, response, user_avatar_url=''):
         item = ItemLoader(item=User(), response=response)
         item.add_css(FULL_NAME, '.name-bio-message h3')
         item.add_css(USERNAME, '.profileusername')
