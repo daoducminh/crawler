@@ -88,16 +88,16 @@ class FoodSpider(Spider):
         if items:
             for i in items:
                 data = {
-                    DESCRIPTION: i[DESCRIPTION],
-                    IMAGE_URL: i['recipe_photo_url'],
-                    REVIEW_COUNT: i['main_num_ratings'],
-                    CATEGORY: i['primary_category_name'],
-                    FACTS_TIME: i['recipe_totaltime'],
+                    DESCRIPTION: i.get(DESCRIPTION, ''),
+                    IMAGE_URL: i.get('recipe_photo_url', ''),
+                    REVIEW_COUNT: i.get('main_num_ratings', 0),
+                    CATEGORY: i.get('primary_category_name'),
+                    FACTS_TIME: i.get('recipe_totaltime', 0),
                     RECIPE_ID: i[RECIPE_ID],
                     AUTHOR_ID: i['main_userid'],
                     AUTHOR_URL: i['recipe_user_url'],
                     FULL_NAME: i['main_title'],
-                    USER_AVATAR_URL: i[USER_AVATAR_URL]
+                    USER_AVATAR_URL: i.get(USER_AVATAR_URL, '')
                 }
                 yield Request(
                     url=i['record_url'],
