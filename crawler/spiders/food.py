@@ -242,12 +242,14 @@ class FoodSpider(Spider):
 
     def parse_follow(self, response, user, f_type):
         body = response.json()
-        item = body['data']['items'][0]
-        if item:
-            yield {
-                TYPE: f_type,
-                FOLLOW: handle_follow(item)
-            }
+        a = body['data']['items']
+        if a:
+            item = a[0]
+            if item:
+                yield {
+                    TYPE: f_type,
+                    FOLLOW: handle_follow(item)
+                }
 
     def parse_review(self, response):
         body = response.json()
