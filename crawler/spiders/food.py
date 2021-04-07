@@ -6,7 +6,7 @@ from scrapy.loader import ItemLoader
 from scrapy_splash import SplashRequest, SplashResponse
 
 from crawler.items import Recipe, User
-from crawler.constants.food import *
+from .food_const import *
 
 PAGES = 2000
 RECIPE_URL = 'https://www.food.com/recipe/all/popular?pn={}'
@@ -58,9 +58,9 @@ class FoodSpider(Spider):
         # },
         # 'SPLASH_URL': 'http://127.0.0.1:8050',
         # 'DUPEFILTER_CLASS': 'scrapy_splash.SplashAwareDupeFilter',
-        'ITEM_PIPELINES': {
-            'crawler.pipelines.FoodPicklePipeline': 100
-        },
+        # 'ITEM_PIPELINES': {
+        #     'crawler.pipelines.FoodPicklePipeline': 100
+        # },
         'RETRY_TIMES': 20
     }
 

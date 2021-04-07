@@ -13,17 +13,10 @@ setup(
         'static',
         'templates',
         '.gitignore',
-        'README.md',
+        'README.md'
     ]),
-    entry_points={'scrapy': ['settings = book_crawler.settings']},
+    entry_points={'scrapy': ['settings = crawler.settings']},
     install_requires=[
-        'scrapy',
-        'scrapy-splash',
-        'pymongo',
-        'pylint',
-        'autopep8',
-        'rope',
-        'python-dotenv',
-        'jsbeautifier'
+        'scrapy'
     ]
 )
