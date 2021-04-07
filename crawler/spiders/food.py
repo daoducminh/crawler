@@ -8,7 +8,7 @@ from scrapy_splash import SplashRequest, SplashResponse
 from crawler.items import Recipe, User
 from .food_const import *
 
-PAGES = 2000
+PAGES = 55000
 RECIPE_URL = 'https://www.food.com/recipe/all/popular?pn={}'
 MOST_TWEAK_URL = 'https://www.food.com/ideas/most-tweaked-recipes-6655'
 FOLLOW_URL = 'https://api.food.com/external/v1/members/{0}/feed/{1}?pn={2}&size=1'
