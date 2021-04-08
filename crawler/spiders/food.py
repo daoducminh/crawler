@@ -181,10 +181,10 @@ class FoodSpider(Spider):
             user[TYPE] = USER
             user[USER_AVATAR_URL] = user_avatar_url
             yield user
-            yield Request(
-                url=OWN_RECIPE_URL.format(user[USER_ID], 1),
-                callback=self.parse_first_own_recipe
-            )
+#             yield Request(
+#                 url=OWN_RECIPE_URL.format(user[USER_ID], 1),
+#                 callback=self.parse_first_own_recipe
+#             )
             # Followers
             if user[FOLLOWER]:
                 for i in range(1, 1+user[FOLLOWER]):
